@@ -31,8 +31,7 @@ export const loginStyles = StyleSheet.create({
   },
   title: {
     fontSize: fontSize["4xl"],
-    fontFamily: fontFamily.body,
-    fontWeight: fontWeight.bold as any,
+    fontFamily: fontFamily.headingSemiBold,
     textAlign: "center",
     marginBottom: spacing.xxl,
   },
@@ -47,8 +46,7 @@ export const loginStyles = StyleSheet.create({
   },
   label: {
     color: colors.text.primary,
-    fontFamily: fontFamily.body,
-    fontWeight: fontWeight.semibold as any,
+    fontFamily: fontFamily.heading,
     marginBottom: spacing.sm,
     fontSize: fontSize.base,
   },
@@ -76,7 +74,7 @@ export const loginStyles = StyleSheet.create({
   },
   loginButtonText: {
     color: colors.neutral.black,
-    fontFamily: fontFamily.body,
+    fontFamily: fontFamily.headingSemiBold,
     fontWeight: fontWeight.bold as any,
     fontSize: fontSize.lg,
   },
