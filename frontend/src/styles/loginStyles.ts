@@ -110,6 +110,11 @@ export const loginStyles = StyleSheet.create({
     fontSize: fontSize["2xl"],
     marginRight: spacing.sm,
   },
+  socialIconImage: {
+    width: 24,
+    height: 24,
+    marginRight: spacing.sm,
+  },
   socialButtonText: {
     color: colors.neutral.black,
     fontFamily: fontFamily.body,

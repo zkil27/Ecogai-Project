@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Image,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { loginStyles as styles } from "../styles/loginStyles";
@@ -91,12 +92,18 @@ export default function LoginScreen() {
 
         <View style={styles.socialButtons}>
           <TouchableOpacity style={styles.socialButton}>
-            <Text style={styles.socialIcon}>G</Text>
+            <Image
+              source={require("../../assets/images/google-icon.png")}
+              style={styles.socialIconImage}
+            />
             <Text style={styles.socialButtonText}>Google</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.socialButton}>
-            <Text style={styles.socialIcon}>f</Text>
+            <Image
+              source={require("../../assets/images/facebook-icon.png")}
+              style={styles.socialIconImage}
+            />
             <Text style={styles.socialButtonText}>Facebook</Text>
           </TouchableOpacity>
         </View>
