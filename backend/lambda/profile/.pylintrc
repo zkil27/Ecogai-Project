@@ -1,0 +1,2 @@
+[MASTER]
+extension-pkg-whitelist=boto3,botocore
