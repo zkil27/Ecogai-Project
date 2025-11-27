@@ -40,6 +40,9 @@ export const splashStyles = StyleSheet.create({
   },
 });
 
+// ============================================
+// WELCOME SCREEN - First screen after splash
+// ============================================
 export const welcomeStyles = StyleSheet.create({
   container: {
     flex: 1,
@@ -70,19 +73,14 @@ export const welcomeStyles = StyleSheet.create({
   },
   title: {
     fontSize: fontSize["4xl"],
-    fontFamily: "Jost",
-    fontWeight: "700" as TextStyle["fontWeight"],
+    fontFamily: fontFamily.headingBold,
     marginBottom: spacing.sm,
   },
   titleGreen: {
     color: colors.primary.green,
-    fontFamily: "Jost",
-    fontWeight: "700" as TextStyle["fontWeight"],
   },
   titleBlack: {
     color: colors.neutral.black,
-    fontFamily: "Jost",
-    fontWeight: "700" as TextStyle["fontWeight"],
   },
   subtitle: {
     textAlign: "center",
@@ -129,6 +127,9 @@ export const welcomeStyles = StyleSheet.create({
   },
 });
 
+// ============================================
+// LOGIN SCREEN - User login form
+// ============================================
 export const loginStyles = StyleSheet.create({
   container: {
     flex: 1,

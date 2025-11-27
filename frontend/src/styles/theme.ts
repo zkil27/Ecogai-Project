@@ -1,4 +1,17 @@
-// Global theme colors and styles for Ecogai app
+/**
+ * THEME.TS - Your Design System
+ *
+ * This file contains ALL design values in ONE place.
+ * Change colors, fonts, or spacing here and it updates EVERYWHERE in your app.
+ *
+ * Usage in screens.ts:
+ *   backgroundColor: colors.primary.green  ✅
+ *   backgroundColor: "#A4D65E"            ❌ Don't hardcode!
+ */
+
+// ============================================
+// COLORS - All app colors in one place
+// ============================================
 
 export const colors = {
   // Primary Colors
@@ -46,35 +59,48 @@ export const colors = {
   },
 };
 
+// ============================================
+// SPACING - Consistent margins and padding
+// ============================================
 export const spacing = {
-  xs: 4,
-  sm: 8,
-  md: 16,
-  lg: 24,
-  xl: 32,
-  xxl: 48,
+  xs: 4, // Tiny gaps
+  sm: 8, // Small gaps
+  md: 16, // Medium gaps (most common)
+  lg: 24, // Large gaps
+  xl: 32, // Extra large gaps
+  xxl: 48, // Huge gaps
 };
 
+// ============================================
+// BORDER RADIUS - Rounded corners
+// ============================================
 export const borderRadius = {
-  sm: 8,
-  md: 16,
-  lg: 24,
-  xl: 32,
-  full: 9999,
+  sm: 8, // Slightly rounded
+  md: 16, // Medium rounded
+  lg: 24, // Very rounded (buttons)
+  xl: 32, // Extra rounded (inputs)
+  full: 9999, // Perfect circle
 };
 
+// ============================================
+// FONT SIZES - Text sizes
+// ============================================
 export const fontSize = {
-  xs: 12,
-  sm: 14,
-  base: 16,
-  lg: 18,
-  xl: 20,
-  "2xl": 24,
-  "3xl": 30,
-  "4xl": 36,
-  "5xl": 48,
+  xs: 12, // Tiny text
+  sm: 14, // Small text
+  base: 16, // Normal text (default)
+  lg: 18, // Large text
+  xl: 20, // Extra large
+  "2xl": 24, // Headings
+  "3xl": 30, // Big headings
+  "4xl": 36, // Screen titles
+  "5xl": 48, // Splash screen
 };
 
+// ============================================
+// FONT WEIGHTS - NOT USED with static fonts
+// Use fontFamily variants instead (bodyBold, headingBold, etc.)
+// ============================================
 export const fontWeight = {
   normal: "400",
   medium: "500",
@@ -84,18 +110,44 @@ export const fontWeight = {
   black: "900",
 };
 
+// ============================================
+// FONTS - Use these for text styles
+//
+// HEADINGS (titles, bold text):
+//   - headingBold: "ECOGAI" title
+//   - heading: Regular MuseoModerno
+//
+// BODY TEXT (paragraphs, buttons):
+//   - bodyBold: Bold buttons
+//   - bodySemiBold: Semi-bold text
+//   - body: Regular text
+//   - bodyLight: Light text
+// ============================================
 export const fontFamily = {
-  // Headings and titles
-  heading: "MuseoModerno",
-  headingItalic: "MuseoModerno-Italic",
+  // Headings - MuseoModerno
+  headingLight: "MuseoModerno-Light",
+  heading: "MuseoModerno-Regular",
+  headingMedium: "MuseoModerno-Medium",
+  headingSemiBold: "MuseoModerno-SemiBold",
+  headingBold: "MuseoModerno-Bold",
+  headingExtraBold: "MuseoModerno-ExtraBold",
 
-  // Body text
-  body: "Jost",
+  // Body - Jost
+  bodyLight: "Jost-Light",
+  body: "Jost-Regular",
+  bodyMedium: "Jost-Medium",
+  bodySemiBold: "Jost-SemiBold",
+  bodyBold: "Jost-Bold",
+  bodyExtraBold: "Jost-ExtraBold",
   bodyItalic: "Jost-Italic",
 };
 
+// ============================================
+// SHADOWS - Drop shadows for cards/buttons
+// ============================================
 export const shadows = {
   sm: {
+    // Small shadow (subtle)
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -103,6 +155,7 @@ export const shadows = {
     elevation: 2,
   },
   md: {
+    // Medium shadow (cards)
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
@@ -110,6 +163,7 @@ export const shadows = {
     elevation: 4,
   },
   lg: {
+    // Large shadow (floating elements)
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.2,
@@ -117,3 +171,27 @@ export const shadows = {
     elevation: 8,
   },
 };
+
+/**
+ * ============================================
+ * HOW TO USE THIS THEME:
+ * ============================================
+ *
+ * In screens.ts, import and use:
+ *
+ * import { colors, fontSize, spacing, fontFamily } from "./theme";
+ *
+ * const styles = StyleSheet.create({
+ *   title: {
+ *     color: colors.primary.green,        // ✅ Use theme
+ *     fontSize: fontSize["4xl"],          // ✅ Use theme
+ *     fontFamily: fontFamily.headingBold, // ✅ Use theme
+ *     marginBottom: spacing.xl,           // ✅ Use theme
+ *   }
+ * });
+ *
+ * DON'T hardcode values:
+ *   color: "#A4D65E"        ❌ Bad
+ *   fontSize: 36            ❌ Bad
+ *   marginBottom: 32        ❌ Bad
+ */

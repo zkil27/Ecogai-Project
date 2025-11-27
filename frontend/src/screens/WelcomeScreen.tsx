@@ -14,23 +14,9 @@ export default function WelcomeScreen() {
           <Text style={styles.logoEmoji}>🌿</Text>
         </View>
 
-        <Text style={[styles.title, { fontFamily: "Jost", fontWeight: "700" }]}>
-          <Text
-            style={[
-              styles.titleGreen,
-              { fontFamily: "Jost", fontWeight: "700" },
-            ]}
-          >
-            ECOG
-          </Text>
-          <Text
-            style={[
-              styles.titleBlack,
-              { fontFamily: "Jost", fontWeight: "700" },
-            ]}
-          >
-            AI
-          </Text>
+        <Text style={styles.title}>
+          <Text style={styles.titleGreen}>ECOG</Text>
+          <Text style={styles.titleBlack}>AI</Text>
         </Text>
 
         <Text style={styles.subtitle}>
