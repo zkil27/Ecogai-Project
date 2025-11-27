@@ -29,6 +29,11 @@ export const loginStyles = StyleSheet.create({
     fontSize: fontSize["2xl"],
     color: colors.neutral.darkGray,
   },
+  backButtonIcon: {
+    width: 24,
+    height: 24,
+    tintColor: colors.neutral.darkGray,
+  },
   title: {
     fontSize: fontSize["4xl"],
     fontFamily: fontFamily.headingSemiBold,

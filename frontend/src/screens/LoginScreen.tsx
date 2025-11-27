@@ -6,19 +6,36 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { loginStyles as styles } from "../styles/loginStyles";
+import { colors } from "../styles/theme";
+import api from "../services/api";
 
 export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    // Add login logic here
-    console.log("Login:", { email, password });
+  const handleLogin = async () => {
+    if (!email.trim() || !password.trim()) {
+      Alert.alert("Error", "Please enter email and password");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await api.login(email, password);
+      setLoading(false);
+      router.replace("/home");
+    } catch (error: any) {
+      setLoading(false);
+      Alert.alert("Error", error?.message || "Login failed. Please try again.");
+    }
   };
 
   return (
@@ -29,7 +46,10 @@ export default function LoginScreen() {
           onPress={() => router.back()}
           style={styles.backButton}
         >
-          <Text style={styles.backButtonText}>←</Text>
+          <Image
+            source={require("../../assets/images/back-icon.png")}
+            style={styles.backButtonIcon}
+          />
         </TouchableOpacity>
 
         {/* Title */}
@@ -76,8 +96,16 @@ export default function LoginScreen() {
         </View>
 
         {/* Sign Up Button */}
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Sign Up</Text>
+        <TouchableOpacity 
+          style={styles.loginButton} 
+          onPress={handleLogin}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color={colors.text.primary} />
+          ) : (
+            <Text style={styles.loginButtonText}>Log In</Text>
+          )}
         </TouchableOpacity>
 
         {/* Forgot Password */}
