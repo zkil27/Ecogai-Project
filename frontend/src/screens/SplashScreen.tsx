@@ -7,9 +7,9 @@ export default function SplashScreen() {
   const router = useRouter();
 
   useEffect(() => {
-    // Navigate to welcome after 3 seconds
+    // Navigate to home directly (bypass login for testing)
     const timer = setTimeout(() => {
-      router.replace("/welcome");
+      router.replace("/home");
     }, 3000);
 
     return () => clearTimeout(timer);

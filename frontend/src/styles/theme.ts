@@ -59,6 +59,14 @@ export const colors = {
     input: "#B3B0B0",
     inputFocused: "#416D19",
   },
+
+  // Status Colors
+  status: {
+    success: "#4CAF50",
+    error: "#F44336",
+    warning: "#FF9800",
+    info: "#2196F3",
+  },
 };
 
 // ============================================
