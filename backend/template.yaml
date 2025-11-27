@@ -1,0 +1,264 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/awslabs/goformation/master/schema/cloudformation.schema.json
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Pollution Monitoring App Backend
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: python3.11
+    MemorySize: 512
+
+Resources:
+  # 1. Signup Handler
+  SignupHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: PollutionApp-SignupHandler
+      CodeUri: lambda/auth/
+      Handler: signup_handler.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
+        - Statement:
+            - Effect: Allow
+              Action:
+                - cognito-idp:AdminCreateUser
+                - cognito-idp:AdminSetUserPassword
+              Resource: !GetAtt UserPool.Arn
+      Environment:
+        Variables:
+          COGNITO_USER_POOL_ID: !Ref UserPool
+      Events:
+        Signup:
+          Type: Api
+          Properties:
+            Path: /signup
+            Method: post
+
+  # 2. Profile Manager
+  ProfileManager:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: PollutionApp-ProfileManager
+      CodeUri: lambda/profile/
+      Handler: profile_manager.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
+      Events:
+        GetProfile:
+          Type: Api
+          Properties:
+            Path: /profile/{userId}
+            Method: get
+        UpdateProfile:
+          Type: Api
+          Properties:
+            Path: /profile/{userId}
+            Method: put
+
+  # 3. Pollution Report Handler (MAPS - PINS LOCATIONS)
+  ReportHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: PollutionApp-ReportHandler
+      CodeUri: lambda/pollution/
+      Handler: report_handler.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ReportsTable
+        - S3CrudPolicy:
+            BucketName: !Ref MediaBucket
+        - Statement:
+          - Effect: Allow
+            Action:
+              - events:PutEvents
+            Resource: !Sub 'arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/default'
+      Events:
+        CreateReport:
+          Type: Api
+          Properties:
+            Path: /reports
+            Method: post
+        GetReports:
+          Type: Api
+          Properties:
+            Path: /reports
+            Method: get
+
+  # 4. SageMaker Predictor (ML PREDICTIONS)
+  SageMakerPredictor:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: PollutionApp-SageMakerPredictor
+      CodeUri: lambda/ai/
+      Handler: sagemaker_predictor.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ReportsTable
+        - Statement:
+          - Effect: Allow
+            Action:
+              - sagemaker:InvokeEndpoint
+            Resource: !Sub 'arn:aws:sagemaker:${AWS::Region}:${AWS::AccountId}:endpoint/*'
+          - Effect: Allow
+            Action:
+              - ssm:GetParameter
+            Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/pollution-app/*'
+      Events:
+        PollutionReportEvent:
+          Type: EventBridgeRule
+          Properties:
+            Pattern:
+              source:
+                - pollution.app
+              detail-type:
+                - NewPollutionReport
+
+  # 5. Health Advisor (BEDROCK TIPS)
+  HealthAdvisor:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: PollutionApp-HealthAdvisor
+      CodeUri: lambda/ai/
+      Handler: health_advisor.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref HealthAlertsTable
+        - Statement:
+          - Effect: Allow
+            Action:
+              - bedrock:InvokeModel
+            Resource: !Sub 'arn:aws:bedrock:${AWS::Region}::foundation-model/*'
+          - Effect: Allow
+            Action:
+              - ssm:GetParameter
+            Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/pollution-app/*'
+      Events:
+        GetAdvice:
+          Type: Api
+          Properties:
+            Path: /health-advice
+            Method: post
+
+  # DynamoDB Tables
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: PollutionApp-Users
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: email
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: EmailIndex
+          KeySchema:
+            - AttributeName: email
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+
+  ReportsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: PollutionApp-Reports
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: reportId
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: N
+      KeySchema:
+        - AttributeName: reportId
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+
+  HealthAlertsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: PollutionApp-HealthAlerts
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: alertId
+          AttributeType: S
+        - AttributeName: userId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: alertId
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: UserIndex
+          KeySchema:
+            - AttributeName: userId
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+
+  # S3 Bucket for images/videos
+  MediaBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'pollution-app-media-${AWS::AccountId}'
+      CorsConfiguration:
+        CorsRules:
+          - AllowedOrigins:
+              - '*'
+            AllowedMethods:
+              - GET
+              - PUT
+              - POST
+            AllowedHeaders:
+              - '*'
+
+  # Cognito User Pool
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: PollutionApp-Users
+      AutoVerifiedAttributes:
+        - email
+      UsernameAttributes:
+        - email
+      Schema:
+        - Name: email
+          Required: true
+          Mutable: false
+        - Name: name
+          Required: true
+          Mutable: true
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref UserPool
+      ClientName: PollutionAppClient
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+
+Outputs:
+  ApiUrl:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  
+  UserPoolId:
+    Description: "Cognito User Pool ID"
+    Value: !Ref UserPool
+  
+  UserPoolClientId:
+    Description: "Cognito User Pool Client ID"
+    Value: !Ref UserPoolClient
+  
+  MediaBucketName:
+    Description: "S3 Bucket for media uploads"
+    Value: !Ref MediaBucket
