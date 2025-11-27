@@ -1,0 +1,27 @@
+{
+  "region": "us-east-1",
+  "cognito": {
+    "userPoolName": "ecogai-users",
+    "clientName": "ecogai-app"
+  },
+  "dynamodb": {
+    "tables": {
+      "users": "ecogai-users",
+      "pollutionData": "ecogai-pollution-data",
+      "userActivity": "ecogai-user-activity"
+    }
+  },
+  "s3": {
+    "buckets": {
+      "userUploads": "ecogai-user-uploads",
+      "appAssets": "ecogai-app-assets"
+    }
+  },
+  "apiGateway": {
+    "name": "ecogai-api",
+    "stage": "prod"
+  },
+  "bedrock": {
+    "modelId": "anthropic.claude-3-sonnet-20240229-v1:0"
+  }
+}
