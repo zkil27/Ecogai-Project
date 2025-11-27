@@ -17,6 +17,10 @@ export const useAppFonts = () => {
     "MuseoModerno-SemiBold": require("../../assets/fonts/MuseoModerno/MuseoModerno-SemiBold.ttf"),
     "MuseoModerno-Bold": require("../../assets/fonts/MuseoModerno/MuseoModerno-Bold.ttf"),
     "MuseoModerno-ExtraBold": require("../../assets/fonts/MuseoModerno/MuseoModerno-ExtraBold.ttf"),
+    "MuseoModerno-Italic": require("../../assets/fonts/MuseoModerno/MuseoModerno-Italic.ttf"),
+    "MuseoModerno-BoldItalic": require("../../assets/fonts/MuseoModerno/MuseoModerno-BoldItalic.ttf"),
+    "MuseoModerno-MediumItalic": require("../../assets/fonts/MuseoModerno/MuseoModerno-MediumItalic.ttf"),
+    "MuseoModerno-LightItalic": require("../../assets/fonts/MuseoModerno/MuseoModerno-LightItalic.ttf"),
   });
 
   return fontsLoaded;

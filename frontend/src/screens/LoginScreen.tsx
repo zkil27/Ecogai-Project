@@ -7,12 +7,13 @@ import {
   ScrollView,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { loginStyles as styles } from "../styles/screens";
+import { loginStyles as styles } from "../styles/loginStyles";
 
 export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [focusedInput, setFocusedInput] = useState<string | null>(null);
 
   const handleLogin = () => {
     // Add login logic here
@@ -40,13 +41,18 @@ export default function LoginScreen() {
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Email</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              focusedInput === "email" && styles.inputFocused,
+            ]}
             placeholder="Email"
             placeholderTextColor="#9E9E9E"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
+            onFocus={() => setFocusedInput("email")}
+            onBlur={() => setFocusedInput(null)}
           />
         </View>
 
@@ -54,12 +60,17 @@ export default function LoginScreen() {
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Password</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              focusedInput === "password" && styles.inputFocused,
+            ]}
             placeholder="Password"
             placeholderTextColor="#9E9E9E"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
+            onFocus={() => setFocusedInput("password")}
+            onBlur={() => setFocusedInput(null)}
           />
         </View>
 

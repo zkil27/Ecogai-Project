@@ -56,6 +56,8 @@ export const colors = {
     primary: "#A4D65E",
     secondary: "#E8E8E8",
     dark: "#5F5F5F",
+    input: "#B3B0B0",
+    inputFocused: "#416D19",
   },
 };
 
@@ -131,6 +133,10 @@ export const fontFamily = {
   headingSemiBold: "MuseoModerno-SemiBold",
   headingBold: "MuseoModerno-Bold",
   headingExtraBold: "MuseoModerno-ExtraBold",
+  headingItalic: "MuseoModerno-Italic",
+  headingBoldItalic: "MuseoModerno-BoldItalic",
+  headingMediumItalic: "MuseoModerno-MediumItalic",
+  headingLightItalic: "MuseoModerno-LightItalic",
 
   // Body - Jost
   bodyLight: "Jost-Light",

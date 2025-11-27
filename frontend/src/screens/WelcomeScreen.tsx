@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
-import { welcomeStyles as styles } from "../styles/screens";
+import { welcomeStyles as styles } from "../styles/welcomeStyles";
 
 export default function WelcomeScreen() {
   const router = useRouter();
@@ -23,8 +23,8 @@ export default function WelcomeScreen() {
           <Text style={styles.subtitleGreen}>
             Your Health and Safety,{"\n"}
           </Text>
-          <Text style={styles.subtitleBlack}>Mapped in </Text>
-          <Text style={styles.subtitleBold}>Real-Time</Text>
+          <Text style={styles.subtitleGreen}>Mapped in </Text>
+          <Text style={styles.subtitleBlack}>Real-Time</Text>
         </Text>
       </View>
 
