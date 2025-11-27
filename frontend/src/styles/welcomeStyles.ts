@@ -30,16 +30,18 @@ export const welcomeStyles = StyleSheet.create({
     logoContainer: {
         width: 128,
         height: 128,
-        marginBottom: spacing.lg,
-        backgroundColor: colors.neutral.white,
+        marginBottom: spacing.md,
         borderRadius: borderRadius.xl,
         alignItems: "center",
         justifyContent: "center",
-        borderWidth: 4,
-        borderColor: colors.neutral.darkGray,
     },
     logoEmoji: {
         fontSize: fontSize["5xl"],
+    },
+    logoImage: {
+        width: 150,
+        height: 150,
+        resizeMode: "contain",
     },
     title: {
         fontSize: fontSize["4xl"],

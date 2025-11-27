@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Image } from "react-native";
 import { useRouter } from "expo-router";
 import { welcomeStyles as styles } from "../styles/welcomeStyles";
 
@@ -11,7 +11,10 @@ export default function WelcomeScreen() {
       {/* Logo and Title */}
       <View style={styles.content}>
         <View style={styles.logoContainer}>
-          <Text style={styles.logoEmoji}>🌿</Text>
+          <Image
+            source={require("../../assets/images/icon.png")}
+            style={styles.logoImage}
+          />
         </View>
 
         <Text style={styles.title}>

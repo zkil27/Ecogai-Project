@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, Text } from "react-native";
+import { View, Text, Image } from "react-native";
 import { useRouter } from "expo-router";
 import { splashStyles as styles } from "../styles/splashStyles";
 
@@ -18,7 +18,10 @@ export default function SplashScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
-        <Text style={styles.logoEmoji}>🌿</Text>
+        <Image
+          source={require("../../assets/images/splash-icon.png")}
+          style={styles.logoImage}
+        />
       </View>
 
       <Text style={styles.title}>
