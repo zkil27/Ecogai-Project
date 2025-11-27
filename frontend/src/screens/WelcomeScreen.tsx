@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
-import { welcomeStyles as styles } from "../styles/screens";
+import { welcomeStyles as styles } from "../styles/welcomeStyles";
 
 export default function WelcomeScreen() {
   const router = useRouter();
@@ -14,31 +14,17 @@ export default function WelcomeScreen() {
           <Text style={styles.logoEmoji}>🌿</Text>
         </View>
 
-        <Text style={[styles.title, { fontFamily: "Jost", fontWeight: "700" }]}>
-          <Text
-            style={[
-              styles.titleGreen,
-              { fontFamily: "Jost", fontWeight: "700" },
-            ]}
-          >
-            ECOG
-          </Text>
-          <Text
-            style={[
-              styles.titleBlack,
-              { fontFamily: "Jost", fontWeight: "700" },
-            ]}
-          >
-            AI
-          </Text>
+        <Text style={styles.title}>
+          <Text style={styles.titleGreen}>ECOG</Text>
+          <Text style={styles.titleBlack}>AI</Text>
         </Text>
 
         <Text style={styles.subtitle}>
           <Text style={styles.subtitleGreen}>
             Your Health and Safety,{"\n"}
           </Text>
-          <Text style={styles.subtitleBlack}>Mapped in </Text>
-          <Text style={styles.subtitleBold}>Real-Time</Text>
+          <Text style={styles.subtitleGreen}>Mapped in </Text>
+          <Text style={styles.subtitleBlack}>Real-Time</Text>
         </Text>
       </View>
 
