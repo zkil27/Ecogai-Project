@@ -17,13 +17,17 @@ export const splashStyles = StyleSheet.create({
     width: 128,
     height: 128,
     marginBottom: spacing.xl,
-    backgroundColor: colors.neutral.white,
     borderRadius: borderRadius.xl,
     alignItems: "center",
     justifyContent: "center",
   },
   logoEmoji: {
     fontSize: fontSize["5xl"],
+  },
+  logoImage: {
+    width: 120,
+    height: 120,
+    resizeMode: "contain",
   },
   title: {
     fontSize: fontSize["5xl"],

@@ -5,19 +5,52 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Image,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { loginStyles as styles } from "../styles/loginStyles";
+import { colors } from "../styles/theme";
+import api from "../services/api";
 
 export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    // Add login logic here
-    console.log("Login:", { email, password });
+  const handleLogin = async () => {
+    if (!email.trim() || !password.trim()) {
+      Alert.alert("Error", "Please enter email and password");
+      return;
+    }
+
+    console.log('🔐 Login attempt started');
+    console.log('📧 Email:', email);
+    console.log('🔑 Password length:', password.length);
+
+    setLoading(true);
+    try {
+      console.log('📡 Calling api.login...');
+      const response = await api.login(email, password);
+      console.log('📥 Login response:', JSON.stringify(response, null, 2));
+      setLoading(false);
+      
+      if (response.success) {
+        console.log('✅ Login successful, navigating to home');
+        router.replace("/home");
+      } else {
+        console.log('❌ Login failed:', response.error);
+        Alert.alert("Error", response.error || "Login failed. Please try again.");
+      }
+    } catch (error: any) {
+      console.log('💥 Login exception:', error);
+      console.log('💥 Error message:', error?.message);
+      setLoading(false);
+      Alert.alert("Error", error?.message || "Login failed. Please try again.");
+    }
   };
 
   return (
@@ -28,7 +61,10 @@ export default function LoginScreen() {
           onPress={() => router.back()}
           style={styles.backButton}
         >
-          <Text style={styles.backButtonText}>←</Text>
+          <Image
+            source={require("../../assets/images/back-icon.png")}
+            style={styles.backButtonIcon}
+          />
         </TouchableOpacity>
 
         {/* Title */}
@@ -75,8 +111,16 @@ export default function LoginScreen() {
         </View>
 
         {/* Sign Up Button */}
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Sign Up</Text>
+        <TouchableOpacity 
+          style={styles.loginButton} 
+          onPress={handleLogin}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color={colors.text.primary} />
+          ) : (
+            <Text style={styles.loginButtonText}>Log In</Text>
+          )}
         </TouchableOpacity>
 
         {/* Forgot Password */}
@@ -91,12 +135,18 @@ export default function LoginScreen() {
 
         <View style={styles.socialButtons}>
           <TouchableOpacity style={styles.socialButton}>
-            <Text style={styles.socialIcon}>G</Text>
+            <Image
+              source={require("../../assets/images/google-icon.png")}
+              style={styles.socialIconImage}
+            />
             <Text style={styles.socialButtonText}>Google</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.socialButton}>
-            <Text style={styles.socialIcon}>f</Text>
+            <Image
+              source={require("../../assets/images/facebook-icon.png")}
+              style={styles.socialIconImage}
+            />
             <Text style={styles.socialButtonText}>Facebook</Text>
           </TouchableOpacity>
         </View>

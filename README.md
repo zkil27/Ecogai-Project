@@ -4,62 +4,46 @@
 
 Ecogai is a full-stack mobile application that helps users monitor pollution levels, receive AI-powered health recommendations, and navigate away from polluted zones.
 
+## Features
+
+- 🗺️ **Pollution Mapping** - Interactive map showing pollution spots with severity levels
+- 📸 **Spot Reporting** - Capture and report pollution using device camera
+- 🤖 **Reiko AI** - AI health assistant for environmental health advice
+- 🔍 **Location Search** - Search places using AWS Location Service
+- 👤 **User Profiles** - Track health conditions and preferences
+- 🔐 **Authentication** - Secure signup/login with OTP verification
+
 ## Project Structure
 
 ```
 Ecogai/
-├── frontend/        # React Native mobile app (Expo)
-├── backend/         # AWS serverless backend
-└── README.md        # This file
+├── frontend/        # React Native mobile app (Expo SDK 54)
+│   ├── app/         # Expo Router screens
+│   └── src/         # Components, services, styles
+├── backend/         # AWS serverless backend + Express server
+│   ├── src/         # Express server
+│   └── lambda/      # AWS Lambda functions
+└── shared/          # Shared TypeScript types
 ```
 
-## Frontend
+## Tech Stack
 
-The frontend is a React Native mobile application built with Expo.
-
-**Location:** `./frontend/`
-
-**Features:**
-
-- Authentication (email, social login)
-- Interactive pollution map
-- AI assistant (Reiko)
-- User profiles
-- Real-time notifications
-
-**Tech Stack:**
-
-- React Native + Expo
+### Frontend
+- React Native + Expo (SDK 54)
 - TypeScript
-- Expo Router
-- React Native Maps
+- Expo Router (file-based navigation)
+- react-native-maps (Google Maps)
+- expo-camera, expo-location
+- NativeWind (Tailwind CSS)
 
-[See frontend README](./frontend/README.md)
-
-## Backend
-
-The backend provides REST/GraphQL APIs and integrates with AWS services.
-
-**Location:** `./backend/`
-
-**Services:**
-
-- User authentication (AWS Cognito)
-- Pollution data management
-- AI assistant (AWS Bedrock)
-- File storage (AWS S3)
-- Real-time updates
-
-**Tech Stack:**
-
-- AWS Lambda
-- AWS API Gateway
-- AWS DynamoDB
-- AWS S3
-- AWS Bedrock
-- Node.js/TypeScript
-
-[See backend README](./backend/README.md)
+### Backend
+- Node.js + Express
+- TypeScript
+- AWS Lambda (authentication)
+- AWS Location Service (maps/geocoding)
+- AWS Cognito (user auth)
+- AWS Bedrock (AI assistant)
+- AWS S3 (file storage)
 
 ## Quick Start
 
@@ -68,37 +52,58 @@ The backend provides REST/GraphQL APIs and integrates with AWS services.
 ```bash
 cd frontend
 npm install
-npm start
+
+# Configure Google Maps API key in app.json
+# Get key from https://console.cloud.google.com/apis/credentials
+
+npx expo prebuild
+npx expo run:android   # or npx expo run:ios
 ```
 
 ### Backend
 
 ```bash
 cd backend
-# Setup instructions coming soon
+npm install
+npm run dev
 ```
 
-## Development Workflow
+## AWS Location Service Integration
 
-1. **Frontend Development**: Run the mobile app locally with Expo
-2. **Backend Development**: Deploy to AWS or use local testing
-3. **Integration**: Connect frontend to backend APIs
+The backend implements these AWS Location Service endpoints for map features:
 
-## Environment Variables
+| Frontend Endpoint | AWS API |
+|-------------------|---------|
+| `GET /location/places/search` | `SearchPlaceIndexForText` |
+| `GET /location/places/suggest` | `SearchPlaceIndexForSuggestions` |
+| `GET /location/geocode/reverse` | `SearchPlaceIndexForPosition` |
+| `POST /location/route` | `CalculateRoute` |
 
-### Frontend
+See `frontend/src/services/api.ts` for detailed endpoint documentation.
 
-See `frontend/.env.example`
+## Running on Physical Device
 
-### Backend
-
-See `backend/.env.example` (to be created)
+1. Enable **USB Debugging** on your Android phone (Settings > Developer Options)
+2. Enable **Install via USB** in Developer Options
+3. Connect phone via USB and authorize debugging
+4. Run `npx expo run:android`
 
 ## Documentation
 
+- [Frontend Setup Guide](./frontend/README.md)
+- [Backend Setup Guide](./backend/README.md)
+- [Lambda Deployment](./backend/README-LAMBDA.md)
 - [API Documentation](./frontend/API_DOCUMENTATION.md)
-- [Frontend Setup Guide](./frontend/SETUP_GUIDE.md)
-- [Implementation Summary](./frontend/IMPLEMENTATION_SUMMARY.md)
+
+## Environment Variables
+
+### Frontend (.env)
+```env
+EXPO_PUBLIC_API_URL=http://localhost:3000
+```
+
+### Backend
+See `backend/.env.example`
 
 ## License
 
