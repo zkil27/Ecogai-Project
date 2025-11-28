@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/awslabs/goformation/master/schema/cloudformation.schema.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/awslabs/goformation/v7.0.0/schema/cloudformation.schema.json
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Pollution Monitoring App Backend

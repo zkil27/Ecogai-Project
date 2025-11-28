@@ -11,7 +11,7 @@ cognito = boto3.client('cognito-idp')
 cloudwatch = boto3.client('cloudwatch')
 
 # Environment variables
-USERS_TABLE = os.environ.get('USERS_TABLE', 'PollutionApp-Users')
+USERS_TABLE = os.environ.get('USERS_TABLE', 'Ecogai-Users')
 COGNITO_USER_POOL_ID = os.environ.get('COGNITO_USER_POOL_ID')
 
 # DynamoDB table
