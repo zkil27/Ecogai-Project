@@ -87,34 +87,46 @@ Resources:
             Path: /reports
             Method: get
 
-  # 4. SageMaker Predictor (ML PREDICTIONS)
-  SageMakerPredictor:
+# NEW: Agora + Google Maps Handler
+  AgoraGoogleMapsHandler:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: PollutionApp-SageMakerPredictor
+      FunctionName: PollutionApp-AgoraGoogleMapsHandler
       CodeUri: lambda/ai/
-      Handler: sagemaker_predictor.lambda_handler
+      Handler: agora_google_maps_handler.lambda_handler
+      Timeout: 30
+      MemorySize: 512
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref ReportsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
         - Statement:
           - Effect: Allow
             Action:
-              - sagemaker:InvokeEndpoint
-            Resource: !Sub 'arn:aws:sagemaker:${AWS::Region}:${AWS::AccountId}:endpoint/*'
+              - bedrock:InvokeModel
+            Resource: '*'
           - Effect: Allow
             Action:
               - ssm:GetParameter
             Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/pollution-app/*'
       Events:
-        PollutionReportEvent:
-          Type: EventBridgeRule
+        GenerateToken:
+          Type: Api
           Properties:
-            Pattern:
-              source:
-                - pollution.app
-              detail-type:
-                - NewPollutionReport
+            Path: /agora/token
+            Method: post
+        ProcessReport:
+          Type: Api
+          Properties:
+            Path: /agora/report
+            Method: post
+        GetLocationTips:
+          Type: Api
+          Properties:
+            Path: /agora/location-tips
+            Method: post
+            
 
   # 5. Health Advisor (BEDROCK TIPS)
   HealthAdvisor:
