@@ -251,7 +251,7 @@ export default function SpotScreen() {
           )}
         </TouchableOpacity>
 
-        <View style={{ height: 100 }} />
+        <View style={{ height: 20 }} />
       </ScrollView>
     );
   }
@@ -338,11 +338,11 @@ const styles = StyleSheet.create({
   // Capture panel (bottom section)
   capturePanel: {
     position: "absolute",
-    bottom: 80, // Space for bottom nav
+    bottom: 100,
     left: 0,
     right: 0,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.lg,
   },
   captureRow: {
     flexDirection: "row",
@@ -411,19 +411,20 @@ const styles = StyleSheet.create({
   formContainer: {
     flex: 1,
     backgroundColor: colors.background.primary,
-    padding: spacing.lg,
-    paddingTop: 60,
+    paddingHorizontal: spacing.lg,
+    paddingTop: 50,
+    paddingBottom: 100,
   },
   formTitle: {
     fontFamily: fontFamily.headingSemiBold,
     fontSize: fontSize["2xl"],
     color: colors.text.primary,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
     textAlign: "center",
   },
   formImagePreview: {
     width: "100%",
-    height: 220,
+    height: 200,
     borderRadius: borderRadius.lg,
     marginBottom: spacing.xs,
   },
@@ -431,19 +432,19 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: colors.text.secondary,
     fontSize: fontSize.sm,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
   },
   formLabel: {
     fontFamily: fontFamily.bodySemiBold,
     fontSize: fontSize.sm,
     color: colors.text.secondary,
-    marginBottom: spacing.xs,
-    textTransform: "uppercase",
+    marginBottom: spacing.sm,
+    marginTop: spacing.sm,
   },
   typeSelector: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
     gap: spacing.sm,
   },
   typeOption: {
@@ -469,7 +470,7 @@ const styles = StyleSheet.create({
   },
   severitySelector: {
     flexDirection: "row",
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
     gap: spacing.sm,
   },
   severityOption: {

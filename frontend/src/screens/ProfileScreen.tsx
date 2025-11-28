@@ -210,8 +210,8 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: spacing.lg,
-    paddingTop: 60,
-    paddingBottom: 120,
+    paddingTop: 50,
+    paddingBottom: 100,
   },
 
   // Title

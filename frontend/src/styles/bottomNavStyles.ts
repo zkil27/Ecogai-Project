@@ -19,7 +19,7 @@ export const bottomNavStyles = StyleSheet.create({
   // ============================================
   container: {
     position: "absolute",
-    bottom: spacing.lg,                        // 24px from bottom
+    bottom: 40,                                // Higher to avoid system nav buttons
     left: spacing.lg,                          // 24px from left
     right: spacing.lg,                         // 24px from right
     backgroundColor: colors.neutral.white,
@@ -68,7 +68,7 @@ export const bottomNavStyles = StyleSheet.create({
   // ============================================
   expandedContainer: {
     position: "absolute",
-    bottom: spacing.lg,
+    bottom: 40,                                // Higher to avoid system nav buttons
     left: spacing.lg,
     right: spacing.lg,
     backgroundColor: colors.neutral.white,
