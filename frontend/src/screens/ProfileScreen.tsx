@@ -1,6 +1,7 @@
 /**
  * PROFILE SCREEN
  * User profile and settings - matches UI mockup
+ * Connects to Lambda /profile/{userId} endpoint
  */
 
 import React, { useState, useEffect } from "react";
@@ -13,11 +14,13 @@ import {
   Switch,
   Alert,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { colors, fontFamily, fontSize, spacing, borderRadius, shadows } from "../styles/theme";
 import { User } from "../types";
+import api from "../services/api";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -28,14 +31,49 @@ export default function ProfileScreen() {
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
   useEffect(() => {
-    // Demo mode - use mock data
-    setUser({
-      id: "1",
-      name: "Reika",
-      email: "Reika@pcu.edu.ph",
-    });
-    setLoading(false);
+    loadProfile();
   }, []);
+
+  const loadProfile = async () => {
+    setLoading(true);
+    try {
+      const userId = api.getUserId();
+      if (userId) {
+        const response = await api.getProfile(userId);
+        if (response.success && response.data) {
+          setUser({
+            id: response.data.userId,
+            name: response.data.name,
+            email: response.data.email,
+          });
+        } else {
+          // Use demo data if profile not found
+          setUser({
+            id: "1",
+            name: "Reika",
+            email: "Reika@pcu.edu.ph",
+          });
+        }
+      } else {
+        // Demo mode - use mock data
+        setUser({
+          id: "1",
+          name: "Reika",
+          email: "Reika@pcu.edu.ph",
+        });
+      }
+    } catch (error) {
+      console.error("Error loading profile:", error);
+      // Use demo data on error
+      setUser({
+        id: "1",
+        name: "Reika",
+        email: "Reika@pcu.edu.ph",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handlePickImage = async () => {
     // Request permission
@@ -59,7 +97,7 @@ export default function ProfileScreen() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     Alert.alert(
       "Logout",
       "Are you sure you want to logout?",
@@ -68,7 +106,8 @@ export default function ProfileScreen() {
         {
           text: "Logout",
           style: "destructive",
-          onPress: () => {
+          onPress: async () => {
+            await api.logout();
             router.replace("/welcome");
           },
         },

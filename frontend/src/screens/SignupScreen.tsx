@@ -139,48 +139,37 @@ export default function SignupScreen() {
   };
 
   const handleResendOtp = async () => {
-    try {
-      setLoading(true);
-      await api.sendOTP(signupData.phoneNumber);
-      setLoading(false);
-      Alert.alert("Success", "OTP code has been resent");
-    } catch (error) {
-      setLoading(false);
-      Alert.alert("Error", "Failed to resend OTP");
-    }
+    // OTP is not implemented in Lambda backend yet
+    // For now, just show a message
+    Alert.alert("Info", "OTP verification will be available soon. You can skip this step.");
   };
 
   const handleSignup = async () => {
     try {
-      // Verify OTP first
-      const otpCode = otp.join("");
-      if (otpCode.length !== 4) {
-        Alert.alert("Error", "Please enter the complete OTP code");
-        return;
-      }
-
       setLoading(true);
 
-      // Verify OTP
-      await api.verifyOTP(signupData.phoneNumber, otpCode);
-
-      // Create account
-      const signupResponse = await api.signup({
+      // Create account via Lambda
+      const response = await api.signup({
         email: signupData.email,
         password: signupData.password,
-        phoneNumber: signupData.phoneNumber,
-        medicalCondition: signupData.medicalCondition || undefined,
-        medicalProofUrl: undefined, // TODO: Add uploaded file URL
+        name: signupData.email.split('@')[0], // Use email prefix as name
+        healthConditions: signupData.medicalCondition ? [signupData.medicalCondition] : [],
+        barangay: '',
+        city: 'Manila',
       });
 
       setLoading(false);
 
-      Alert.alert("Success", "Account created successfully!", [
-        {
-          text: "OK",
-          onPress: () => router.replace("/home"),
-        },
-      ]);
+      if (response.success) {
+        Alert.alert("Success", "Account created successfully!", [
+          {
+            text: "OK",
+            onPress: () => router.replace("/home"),
+          },
+        ]);
+      } else {
+        Alert.alert("Error", response.error || "Failed to create account. Please try again.");
+      }
     } catch (error: any) {
       setLoading(false);
       Alert.alert(

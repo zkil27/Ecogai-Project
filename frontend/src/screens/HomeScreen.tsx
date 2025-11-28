@@ -92,8 +92,21 @@ export default function HomeScreen() {
   const loadPollutionSpots = async (latitude: number, longitude: number) => {
     setLoadingSpots(true);
     try {
-      const spots = await api.getPollutionSpots(latitude, longitude, 10);
-      setPollutionSpots(spots);
+      const response = await api.getPollutionSpots(latitude, longitude, 10);
+      if (response.success && response.data && Array.isArray(response.data)) {
+        // Map Lambda response to PollutionSpot format
+        const spots: PollutionSpot[] = response.data.map((report: any) => ({
+          id: report.reportId,
+          latitude: report.location?.latitude || 0,
+          longitude: report.location?.longitude || 0,
+          pollutionType: report.pollutionType || 'air',
+          severity: report.severity || 'medium',
+          description: report.description || '',
+          imageUrl: report.imageUrl,
+          createdAt: report.createdAt,
+        }));
+        setPollutionSpots(spots);
+      }
     } catch (error) {
       console.error("Error loading pollution spots:", error);
       // Silently fail - spots will be empty
@@ -123,30 +136,34 @@ export default function HomeScreen() {
     }, SEARCH_CONFIG.DEBOUNCE_MS);
   };
 
-  // Perform search using AWS Location Service via backend
+  // Perform search using Nominatim (OpenStreetMap geocoding - FREE!)
   const performSearch = async (query: string) => {
     setIsSearching(true);
     setShowSearchResults(true);
 
     try {
-      // Use place suggestions API (autocomplete)
-      // Backend will call AWS Location Service SearchPlaceIndexForSuggestions
-      const response = await api.getPlaceSuggestions(query, userLocation || undefined);
-      setSearchResults(response.suggestions);
+      // Use Nominatim for geocoding (OpenStreetMap's free geocoding service)
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=${SEARCH_CONFIG.MAX_SUGGESTIONS}&countrycodes=ph`
+      );
+      const data = await response.json();
+      
+      const results: PlaceResult[] = data.map((item: any) => ({
+        placeId: item.place_id.toString(),
+        label: item.display_name,
+        location: {
+          latitude: parseFloat(item.lat),
+          longitude: parseFloat(item.lon),
+        },
+        municipality: item.address?.city || item.address?.town || item.address?.village,
+        region: item.address?.state,
+        country: item.address?.country,
+      }));
+      
+      setSearchResults(results);
     } catch (error) {
       console.error("Search error:", error);
-      // Fallback: try full search
-      try {
-        const response = await api.searchPlaces(
-          query,
-          userLocation || undefined,
-          SEARCH_CONFIG.MAX_SUGGESTIONS
-        );
-        setSearchResults(response.results);
-      } catch (fallbackError) {
-        console.error("Fallback search error:", fallbackError);
-        setSearchResults([]);
-      }
+      setSearchResults([]);
     } finally {
       setIsSearching(false);
     }
@@ -180,16 +197,22 @@ export default function HomeScreen() {
     setIsSearching(true);
 
     try {
-      // Full search using AWS Location Service via backend
-      const response = await api.searchPlaces(
-        searchQuery,
-        userLocation || undefined,
-        SEARCH_CONFIG.MAX_SEARCH_RESULTS
+      // Use Nominatim for geocoding
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=${SEARCH_CONFIG.MAX_SEARCH_RESULTS}&countrycodes=ph`
       );
+      const data = await response.json();
 
-      if (response.results.length > 0) {
-        // Go to first result
-        handleSelectSearchResult(response.results[0]);
+      if (data.length > 0) {
+        const result: PlaceResult = {
+          placeId: data[0].place_id.toString(),
+          label: data[0].display_name,
+          location: {
+            latitude: parseFloat(data[0].lat),
+            longitude: parseFloat(data[0].lon),
+          },
+        };
+        handleSelectSearchResult(result);
       } else {
         Alert.alert("No Results", "No places found for your search.");
       }

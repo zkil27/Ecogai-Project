@@ -27,12 +27,27 @@ export default function LoginScreen() {
       return;
     }
 
+    console.log('🔐 Login attempt started');
+    console.log('📧 Email:', email);
+    console.log('🔑 Password length:', password.length);
+
     setLoading(true);
     try {
-      await api.login(email, password);
+      console.log('📡 Calling api.login...');
+      const response = await api.login(email, password);
+      console.log('📥 Login response:', JSON.stringify(response, null, 2));
       setLoading(false);
-      router.replace("/home");
+      
+      if (response.success) {
+        console.log('✅ Login successful, navigating to home');
+        router.replace("/home");
+      } else {
+        console.log('❌ Login failed:', response.error);
+        Alert.alert("Error", response.error || "Login failed. Please try again.");
+      }
     } catch (error: any) {
+      console.log('💥 Login exception:', error);
+      console.log('💥 Error message:', error?.message);
       setLoading(false);
       Alert.alert("Error", error?.message || "Login failed. Please try again.");
     }

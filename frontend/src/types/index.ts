@@ -40,30 +40,34 @@ export interface OTPResponse {
 
 // ============================================
 // POLLUTION SPOT TYPES
+// Matches Lambda report_handler.py
 // ============================================
 export interface PollutionSpot {
   id: string;
-  userId: string;
+  userId?: string;
   latitude: number;
   longitude: number;
-  imageUrl: string;
+  imageUrl?: string;
   description?: string;
   pollutionType: PollutionType;
-  severity: 'low' | 'medium' | 'high';
-  status: 'pending' | 'verified' | 'resolved';
-  createdAt: string;
-  updatedAt: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  status?: 'pending' | 'verified' | 'resolved';
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export type PollutionType = 'air' | 'land';
+// Pollution types from Lambda report_handler.py
+export type PollutionType = 'air' | 'water' | 'noise' | 'waste' | 'soil';
 
 export interface CreateSpotRequest {
-  latitude: number;
-  longitude: number;
-  imageUrl: string;
+  latitude?: number;
+  longitude?: number;
+  location?: string;
+  imageUrl?: string;
   description?: string;
-  pollutionType: PollutionType;
-  severity: 'low' | 'medium' | 'high';
+  type?: PollutionType;
+  pollutionType?: PollutionType;
+  severity?: 'low' | 'medium' | 'high' | 'critical';
 }
 
 export interface SpotResponse {

@@ -2,6 +2,7 @@
  * SPOT SCREEN
  * Camera screen for capturing pollution spots
  * Uses expo-camera for live camera preview
+ * Submits to Lambda POST /reports endpoint
  */
 
 import React, { useState, useEffect, useRef } from "react";
@@ -21,19 +22,24 @@ import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import { colors, fontFamily, fontSize, spacing, borderRadius, shadows } from "../styles/theme";
 import { PollutionType } from "../types";
+import api from "../services/api";
 
 type SpotStep = "capture" | "form";
-type Severity = "low" | "medium" | "high";
+type Severity = "low" | "medium" | "high" | "critical";
 
 const POLLUTION_TYPES: { value: PollutionType; label: string }[] = [
   { value: "air", label: "Air Pollution" },
-  { value: "land", label: "Land Pollution" },
+  { value: "water", label: "Water Pollution" },
+  { value: "noise", label: "Noise Pollution" },
+  { value: "waste", label: "Waste/Garbage" },
+  { value: "soil", label: "Soil Pollution" },
 ];
 
 const SEVERITY_OPTIONS: { value: Severity; label: string }[] = [
   { value: "low", label: "Low" },
   { value: "medium", label: "Medium" },
   { value: "high", label: "High" },
+  { value: "critical", label: "Critical" },
 ];
 
 export default function SpotScreen() {
@@ -123,20 +129,47 @@ export default function SpotScreen() {
 
     setLoading(true);
 
-    // TODO: Replace with actual API call when backend is ready
-    setTimeout(() => {
-      setLoading(false);
-      Alert.alert("Success", "Pollution spot reported successfully!", [
-        {
-          text: "OK",
-          onPress: () => {
-            setCapturedImage(null);
-            setStep("capture");
-            setDescription("");
-          },
+    try {
+      // Convert image to base64 for Lambda upload
+      let imageBase64: string | undefined;
+      try {
+        imageBase64 = await api.imageToBase64(capturedImage);
+      } catch (imgError) {
+        console.log("Image conversion failed, submitting without image");
+      }
+
+      // Submit to Lambda POST /reports
+      const response = await api.createReport({
+        location: {
+          latitude: location.latitude,
+          longitude: location.longitude,
         },
-      ]);
-    }, 1500);
+        pollutionType: pollutionType as 'air' | 'water' | 'noise' | 'waste' | 'soil',
+        severity: severity,
+        description: description || undefined,
+        imageBase64: imageBase64,
+      });
+
+      setLoading(false);
+
+      if (response.success) {
+        Alert.alert("Success", "Pollution spot reported successfully!", [
+          {
+            text: "OK",
+            onPress: () => {
+              setCapturedImage(null);
+              setStep("capture");
+              setDescription("");
+            },
+          },
+        ]);
+      } else {
+        Alert.alert("Error", response.error || "Failed to submit report. Please try again.");
+      }
+    } catch (error: any) {
+      setLoading(false);
+      Alert.alert("Error", error?.message || "Failed to submit report. Please try again.");
+    }
   };
 
   // Permission handling

@@ -96,6 +96,13 @@ Resources:
       Handler: agora_google_maps_handler.lambda_handler
       Timeout: 30
       MemorySize: 512
+      Environment:
+        Variables:
+          AGORA_APP_ID: '52ef1602046f4d84892f4aa02b8c2afd'
+          AGORA_APP_CERTIFICATE: 'b5f6151ba3884b419857824959414807'
+          REPORTS_TABLE: !Ref ReportsTable
+          USERS_TABLE: !Ref UsersTable
+          BEDROCK_MODEL_ID: 'anthropic.claude-3-sonnet-20240229-v1:0'
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref ReportsTable
@@ -135,6 +142,11 @@ Resources:
       FunctionName: PollutionApp-HealthAdvisor
       CodeUri: lambda/ai/
       Handler: health_advisor.lambda_handler
+      Environment:
+        Variables:
+          USERS_TABLE: !Ref UsersTable
+          HEALTH_ALERTS_TABLE: !Ref HealthAlertsTable
+          BEDROCK_MODEL_ID: 'anthropic.claude-3-sonnet-20240229-v1:0'
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UsersTable

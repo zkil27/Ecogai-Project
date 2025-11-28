@@ -125,14 +125,22 @@ export default function ReikoChatScreen() {
   };
 
   const handleOptionPress = async (option: { id: string; text: string }) => {
+    console.log('🎯 Quick option pressed:', option.text);
     setSelectedOption(option.id);
     
     // Add user message
     addMessage('user', option.text);
     
-    // Get AI response and speak it
-    const response = await voiceAI.processTextInput(option.text);
-    addMessage('reiko', response);
+    try {
+      // Get AI response and speak it
+      console.log('🤖 Getting AI response...');
+      const response = await voiceAI.processTextInput(option.text);
+      console.log('📝 Got response:', response);
+      addMessage('reiko', response);
+    } catch (error) {
+      console.error('❌ Error getting response:', error);
+      addMessage('reiko', "Sorry, I couldn't process that. Please try again.");
+    }
     
     setSelectedOption(null);
   };

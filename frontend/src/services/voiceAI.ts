@@ -1,24 +1,25 @@
 /**
  * VOICE AI SERVICE
  * Integrates Agora for real-time voice with Reiko AI
+ * Uses AWS Lambda backend for AI processing
  * 
  * Features:
  * - Voice recording and streaming
  * - Speech-to-Text conversion
- * - AI response generation
- * - Text-to-Speech for Reiko's voice
+ * - AI response generation via Lambda /health-advice
+ * - Text-to-Speech for Reiko's voice (when native module available)
  */
 
-import * as Speech from 'expo-speech';
 import { Audio } from 'expo-av';
-import { API_BASE_URL } from '../constants/config';
+import api from './api';
 
-// Agora configuration - Get these from Agora Console (https://console.agora.io)
-export const AGORA_CONFIG = {
-  appId: 'YOUR_AGORA_APP_ID', // Replace with your Agora App ID
-  channelName: 'reiko-voice-channel',
-  token: null, // For testing, can be null. For production, generate token from backend
-};
+// Try to import Speech, but handle if native module is missing
+let Speech: any = null;
+try {
+  Speech = require('expo-speech');
+} catch (e) {
+  console.warn('⚠️ expo-speech native module not available. TTS disabled.');
+}
 
 // Voice AI State
 interface VoiceAIState {
@@ -154,34 +155,32 @@ class VoiceAIService {
     return 'What is the air quality today?';
   }
 
-  // Get AI response from Reiko
+  // Get AI response from Reiko via Lambda /health-advice
   async getAIResponse(userMessage: string): Promise<string> {
+    console.log('🤖 Getting AI response for:', userMessage);
     this.updateState({ isProcessing: true });
 
     try {
-      // Call your backend AI endpoint
-      const response = await fetch(`${API_BASE_URL}/api/reiko/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: userMessage,
-          context: 'pollution_assistant',
-        }),
-      });
+      // Call Lambda health-advice endpoint for AI responses
+      console.log('📡 Calling Lambda /health-advice...');
+      const response = await api.sendChatMessage(userMessage, 'pollution_assistant');
+      console.log('📥 Lambda response:', JSON.stringify(response, null, 2));
 
-      if (!response.ok) {
-        throw new Error('AI request failed');
+      if (response.success && response.data) {
+        const data = response.data as any;
+        const aiResponse = data.response || data.advice || data.message || this.getFallbackResponse(userMessage);
+        console.log('✅ AI Response:', aiResponse);
+        this.updateState({ response: aiResponse, isProcessing: false });
+        return aiResponse;
+      } else {
+        // Use fallback response
+        console.log('⚠️ No data in response, using fallback');
+        const fallback = this.getFallbackResponse(userMessage);
+        this.updateState({ response: fallback, isProcessing: false });
+        return fallback;
       }
-
-      const data = await response.json();
-      const aiResponse = data.response || this.getFallbackResponse(userMessage);
-      
-      this.updateState({ response: aiResponse, isProcessing: false });
-      return aiResponse;
     } catch (error) {
-      console.error('AI request error:', error);
+      console.error('❌ AI request error:', error);
       // Use fallback response
       const fallback = this.getFallbackResponse(userMessage);
       this.updateState({ response: fallback, isProcessing: false });
@@ -214,6 +213,13 @@ class VoiceAIService {
 
   // Speak the response using Text-to-Speech
   async speak(text: string): Promise<void> {
+    // Check if Speech module is available
+    if (!Speech) {
+      console.log('🔇 TTS not available, skipping speech');
+      this.updateState({ isSpeaking: false });
+      return;
+    }
+
     this.updateState({ isSpeaking: true });
 
     try {
@@ -240,6 +246,11 @@ class VoiceAIService {
 
   // Stop speaking
   async stopSpeaking(): Promise<void> {
+    if (!Speech) {
+      this.updateState({ isSpeaking: false });
+      return;
+    }
+
     try {
       await Speech.stop();
       this.updateState({ isSpeaking: false });
@@ -268,7 +279,9 @@ class VoiceAIService {
 
   // Process text input (for quick options)
   async processTextInput(text: string): Promise<string> {
+    console.log('💬 Processing text input:', text);
     const response = await this.getAIResponse(text);
+    console.log('🔊 Speaking response...');
     await this.speak(response);
     return response;
   }
@@ -283,7 +296,13 @@ class VoiceAIService {
       }
       this.recording = null;
     }
-    await Speech.stop();
+    if (Speech) {
+      try {
+        await Speech.stop();
+      } catch (e) {
+        // Ignore if Speech not available
+      }
+    }
     this.updateState({
       isListening: false,
       isProcessing: false,
