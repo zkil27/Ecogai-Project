@@ -25,10 +25,10 @@ s3 = boto3.client('s3')
 cloudwatch = boto3.client('cloudwatch')
 
 # Environment variables
-USERS_TABLE = os.environ.get('USERS_TABLE', 'PollutionApp-Users')
-REPORTS_TABLE = os.environ.get('REPORTS_TABLE', 'PollutionApp-Reports')
-ALERTS_TABLE = os.environ.get('ALERTS_TABLE', 'PollutionApp-HealthAlerts')
-MEDIA_BUCKET = os.environ.get('MEDIA_BUCKET', 'pollution-app-media-uploads')
+USERS_TABLE = os.environ.get('USERS_TABLE', 'Ecogai-HealthAlerts')
+REPORTS_TABLE = os.environ.get('REPORTS_TABLE', 'Ecogai-Reports')
+ALERTS_TABLE = os.environ.get('ALERTS_TABLE', 'Ecogai-Users')
+MEDIA_BUCKET = os.environ.get('MEDIA_BUCKET', 'ecogai-app-media-uploads')
 
 users_table = dynamodb.Table(USERS_TABLE)
 reports_table = dynamodb.Table(REPORTS_TABLE)

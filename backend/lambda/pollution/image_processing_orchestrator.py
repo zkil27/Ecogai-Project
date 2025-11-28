@@ -11,7 +11,7 @@ sns = boto3.client('sns')
 cloudwatch = boto3.client('cloudwatch')
 
 # Environment variables
-REPORTS_TABLE = os.environ.get('REPORTS_TABLE', 'PollutionApp-Reports')
+REPORTS_TABLE = os.environ.get('REPORTS_TABLE', 'Ecogai-Reports')
 SAGEMAKER_FUNCTION = os.environ.get('SAGEMAKER_FUNCTION', 'PollutionApp-SageMakerPredictor')
 HEALTH_ADVISOR_FUNCTION = os.environ.get('HEALTH_ADVISOR_FUNCTION', 'PollutionApp-HealthAdvisor')
 SNS_TOPIC_ARN = os.environ.get('SNS_TOPIC_ARN')

@@ -1,5 +1,4 @@
 import os
-from urllib import response
 import boto3  # type: ignore
 from botocore.exceptions import ClientError  # type: ignore
 
@@ -12,7 +11,7 @@ class ConfigHelper:
 
     def get(self, key, ssm_path=None, required=True):
 
-        # First, check environment variables (for local devvelop)
+        # First, check environment variables (for local development)
         value = os.environ.get(key)
         if value:
             return value
@@ -29,7 +28,7 @@ class ConfigHelper:
                     Name=ssm_path,
                     WithDecryption=True # Decrypt secure strings
                 )
-                self.cache[key] = response['Parameter'] ['Value']
+                self.cache[key] = response['Parameter']['Value']
                 return self.cache[key]
             
             except ClientError as e:
@@ -94,7 +93,7 @@ def get_app_config():
 
         {
             'key': 'AWS_REGION',
-            'ssmn_path': None,
+            'ssm_path': None,
             'required': True
         }
     ])
