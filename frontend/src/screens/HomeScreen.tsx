@@ -1,7 +1,7 @@
 /**
  * HOME SCREEN
  * Main map view with search bar
- * Uses react-native-maps for display, AWS Location Service via backend for search/geocoding
+ * Uses FREE OpenStreetMap via WebView - NO API KEY REQUIRED!
  * 
  * REQUIRES DEV BUILD: Run `npx expo prebuild` then `npx expo run:android`
  */
@@ -17,8 +17,8 @@ import {
   FlatList,
   Keyboard,
 } from "react-native";
-import MapView, { Marker, PROVIDER_GOOGLE, Region } from "react-native-maps";
 import * as Location from "expo-location";
+import OpenStreetMap from "../components/OpenStreetMap";
 import { homeStyles as styles } from "../styles/homeStyles";
 import { colors } from "../styles/theme";
 import { 
@@ -39,7 +39,6 @@ import {
 
 export default function HomeScreen() {
   // Map state
-  const mapRef = useRef<MapView>(null);
   const [region, setRegion] = useState<MapRegion>(DEFAULT_REGION);
   const [userLocation, setUserLocation] = useState<LocationType | null>(null);
   const [loading, setLoading] = useState(true);
@@ -160,14 +159,13 @@ export default function HomeScreen() {
     setShowSearchResults(false);
     setSearchResults([]);
 
-    // Animate to selected location
+    // Update region to selected location
     const newRegion: MapRegion = {
       latitude: place.location.latitude,
       longitude: place.location.longitude,
       ...ZOOM_LEVELS.STREET,
     };
 
-    mapRef.current?.animateToRegion(newRegion, MAP_ANIMATION.DURATION_MS);
     setRegion(newRegion);
 
     // Load pollution spots for new location
@@ -217,7 +215,6 @@ export default function HomeScreen() {
         ...ZOOM_LEVELS.NEIGHBORHOOD,
       };
 
-      mapRef.current?.animateToRegion(newRegion, MAP_ANIMATION.DURATION_MS);
       setRegion(newRegion);
 
       // Reload pollution spots
@@ -228,7 +225,7 @@ export default function HomeScreen() {
   };
 
   // Handle map region change (when user pans/zooms)
-  const handleRegionChangeComplete = (newRegion: Region) => {
+  const handleRegionChangeComplete = (newRegion: MapRegion) => {
     setRegion(newRegion);
   };
 
@@ -290,34 +287,26 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Map */}
+      {/* Map - FREE OpenStreetMap! */}
       <View style={styles.mapContainer}>
-        <MapView
-          ref={mapRef}
+        <OpenStreetMap
+          latitude={region.latitude}
+          longitude={region.longitude}
+          zoom={15}
+          showUserLocation={true}
+          markers={pollutionSpots.map((spot) => ({
+            id: spot.id,
+            latitude: spot.latitude,
+            longitude: spot.longitude,
+            title: `${spot.pollutionType} - ${spot.severity}`,
+            color: getMarkerColor(spot.severity),
+          }))}
+          onMarkerPress={(id) => {
+            const spot = pollutionSpots.find((s) => s.id === id);
+            if (spot) handleMarkerPress(spot);
+          }}
           style={styles.map}
-          provider={PROVIDER_GOOGLE}
-          initialRegion={region}
-          onRegionChangeComplete={handleRegionChangeComplete}
-          showsUserLocation={true}
-          showsMyLocationButton={false}
-          showsCompass={true}
-          showsScale={true}
-        >
-          {/* Pollution Spot Markers */}
-          {pollutionSpots.map((spot) => (
-            <Marker
-              key={spot.id}
-              coordinate={{
-                latitude: spot.latitude,
-                longitude: spot.longitude,
-              }}
-              title={`${POLLUTION_TYPE_ICONS[spot.pollutionType]} ${spot.pollutionType.charAt(0).toUpperCase() + spot.pollutionType.slice(1)} Pollution`}
-              description={spot.description || `Severity: ${spot.severity}`}
-              pinColor={getMarkerColor(spot.severity)}
-              onPress={() => handleMarkerPress(spot)}
-            />
-          ))}
-        </MapView>
+        />
       </View>
 
       {/* Search Bar */}
